@@ -1,6 +1,6 @@
 from heap import Heap
 from graph import Graph
-from html import html_table
+from html import graph_html
 import operator
 import json
 import time
@@ -150,8 +150,9 @@ if True:
 	print "graph9 astar, bird_distance:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=bird_distance)[-2:])
 	print "graph9 astar, bird_distance / 2:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=lambda *xs: bird_distance(*xs) / 2.0)[-2:])
 	print "graph9 astar, bird_distance * 2:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=lambda *xs: bird_distance(*xs) * 2.0)[-2:])
+	d_path, d_costs, d_explored_count, d_cost = graph9.dijkstra((19, 2), (3, 18))
 	path, costs, hp, explored_count, cost = graph9.astar((19, 2), (3, 18), heuristic=grid_distance)
 
 	with open('graph.html', 'w') as f:
-		f.write(html_table(graph9, path, costs)) #[[{'key': 'x', 'hor': '--', 'ver': ''}]]))
+		f.write(graph_html([(graph9, path, costs), (graph9, d_path, d_costs)]))
 

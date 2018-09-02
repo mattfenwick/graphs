@@ -49,7 +49,6 @@ class Graph(object):
 		while not h.is_empty():
 			explored += 1
 			curr = h.pop()['key']
-			print "curr:", curr
 			cost = costs[curr]
 			done.add(curr)
 			if curr == goal:
@@ -83,7 +82,6 @@ class Graph(object):
 		while not h.is_empty():
 			explored += 1
 			curr = h.pop()['key']
-			print "curr:", curr
 			cost = actual_costs[curr]
 			done.add(curr)
 			if curr == goal:
