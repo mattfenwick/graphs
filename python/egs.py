@@ -154,5 +154,5 @@ if True:
 	path, costs, hp, explored_count, cost = graph9.astar((19, 2), (3, 18), heuristic=grid_distance)
 
 	with open('graph.html', 'w') as f:
-		f.write(graph_html([(graph9, path, costs), (graph9, d_path, d_costs)]))
+		f.write(graph_html([(graph9, d_path, d_costs), (graph9, path, costs)]))
 
