@@ -1,9 +1,12 @@
 class Element(object):
-	def __init__(self, name, children, attrs, classes):
+	def __init__(self, name, children, attrs, classes, is_empty=False):
 		self.name = name
 		self.attrs = attrs
 		if len(classes) > 0:
 			self.attrs.append(('class', ' '.join(classes)))
+		if is_empty and len(children) > 0:
+			raise ValueError('empty element must have 0 children')
+		self.is_empty = is_empty
 		self.children = children
 
 	def html(self, lines, indent=0):
@@ -15,6 +18,9 @@ class Element(object):
 		close_tag = '</{}>'.format(self.name)
 		if len(self.children) == 1 and isinstance(self.children[0], str):
 			lines.append('{}{}{}'.format(open_tag, self.children[0], close_tag))
+			return
+		if self.is_empty:
+			lines.append('{}<{}{} />'.format(ind, self.name, attrs))
 			return
 		lines.append(open_tag)
 		for c in self.children:
@@ -31,7 +37,7 @@ def head(children):
 	return Element('head', children, [], [])
 
 def link(attrs):
-	return Element('link', [], attrs, [])
+	return Element('link', [], attrs, [], True)
 
 def table():
 	return Element('table', [], [], [])
@@ -92,7 +98,7 @@ def graph_html(graphs):
 	])
 	for (graph, path, visited) in graphs:
 		doc.children.append(graph_table(graph, path, visited))
-		doc.children.append(Element('hr', [], [], []))
+		doc.children.append(Element('hr', [], [], [], True))
 	lines = []
 	doc.html(lines)
 	return '\n'.join(lines)
