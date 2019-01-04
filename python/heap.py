@@ -13,6 +13,7 @@ def right(i):
 	return 2 * i + 2
 
 class Heap(object):
+	"""Implements a max heap when comp=operator.gt; implements a min heap when comp=operator.lt"""
 	def __init__(self, initial_size=10, elems=None, comp=operator.gt):
 		self._key_to_index = {}
 		self._comp = comp
@@ -112,6 +113,11 @@ class Heap(object):
 			return None
 		return self._remove(0)
 	
+	def peek(self):
+		if self._size == 0:
+			return None
+		return self._get(0)
+	
 	def remove(self, key):
 		index = self._key_to_index[key]
 		item = self._get(index)
@@ -149,6 +155,9 @@ class Heap(object):
 			self.set_priority(key, priority, value)
 		else:
 			self.add(key, priority, value)
+	
+	def has_key(self, key):
+		return key in self._key_to_index
 	
 	def elems(self):
 		return [e for (i, e) in enumerate(self._elems) if i < self._size]

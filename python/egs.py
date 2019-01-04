@@ -1,6 +1,6 @@
 from heap import Heap
-from graph import Graph
 from html import graph_html
+import graph
 import operator
 import json
 import time
@@ -46,15 +46,16 @@ if False:
 	print h3.remove("mno")
 	print h3.string()
 
-if False:
-	graph_eg1 = Graph(["a", "b", "c", "d", "e"], [("a", "b", 1), ("b", "c", 20), ("b", "d", 3), ("c", "e", 2), ("d", "e", 4)])
+if True:
+	graph_eg1 = graph.Graph(["a", "b", "c", "d", "e"], [("a", "b", 1), ("b", "c", 20), ("b", "d", 3), ("c", "e", 2), ("d", "e", 4)])
 
-	print graph_eg1.dijkstra("a", "e")
-	print graph_eg1.dijkstra_no_path("a", "e")
-	print graph_eg1.dijkstra("a", "c")
-	print graph_eg1.dijkstra_no_path("a", "c")
+	print graph.dijkstra(graph_eg1, "a", "e")
+	print graph.dijkstra_no_path(graph_eg1, "a", "e")
+	print graph.dijkstra(graph_eg1, "a", "c")
+	print graph.dijkstra_no_path(graph_eg1, "a", "c")
 	print "\n"
 
+gg1 = """
 def grid_graph(rows=10, cols=10, weight=lambda x,y: 1):
 	nodes = []
 	edges = []
@@ -85,23 +86,24 @@ def graph_hole(rows, cols, holes, weight=lambda x,y: 1):
 			if col < (cols - 1):
 				edges.append(((row, col), (row, col+1), weight(row, col)))
 	return Graph(nodes, edges)
+"""
 
-if False:
-	graph_eg2 = grid_graph(3, 3)
+if True:
+	graph_eg2 = graph.GridGraph(3, 3)
 	#print json.dumps(graph_eg2.json(), indent=2)
-	print graph_eg2.dijkstra((0, 0), (2, 2))
+	print graph.dijkstra(graph_eg2, (0, 0), (2, 2))
 	print
-	print graph_eg2.dijkstra((0, 0), (0, 2))
+	print graph.dijkstra(graph_eg2, (0, 0), (0, 2))
 
-if False:
-	graph3 = grid_graph(5, 5, lambda x, y: x * y + 1)
+if True:
+	graph3 = graph.GridGraph(5, 5, lambda _, (x, y): x * y + 1)
 	#print graph3.json()
 	print
-	print graph3.dijkstra((0, 0), (4, 4))
+	print graph.dijkstra(graph3, (0, 0), (4, 4))
 	print
 
-if False:
-	graph4 = graph_hole(3, 3, [(0, 0, 1, 1)])
+if True:
+	graph4 = graph.GridGraph(3, 3, holes=[graph.Hole((0, 0), (1, 1))])
 	print graph4.json()
 	print
 
@@ -143,16 +145,47 @@ if False:
 	print "graph8 dijkstra:", measure_time(lambda: graph8.dijkstra((999, 999), (0, 0))[-2:])
 
 if True:
-	graph9 = graph_hole(22, 22, [(7, 5, 8, 15), (9, 13, 13, 15)])
+	graph9 = graph.GridGraph(22, 22, holes=[graph.Hole((7, 5), (8, 15)), graph.Hole((8, 13), (13, 15))])
 	print
-	print "graph9 dijkstra:", measure_time(lambda: graph9.dijkstra((2, 19), (18, 3))[-2:])
-	print "graph9 astar, grid_distance:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=grid_distance)[-2:])
-	print "graph9 astar, bird_distance:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=bird_distance)[-2:])
-	print "graph9 astar, bird_distance / 2:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=lambda *xs: bird_distance(*xs) / 2.0)[-2:])
-	print "graph9 astar, bird_distance * 2:", measure_time(lambda: graph9.astar((2, 19), (18, 3), heuristic=lambda *xs: bird_distance(*xs) * 2.0)[-2:])
-	d_path, d_costs, d_explored_count, d_cost = graph9.dijkstra((19, 2), (3, 18))
-	path, costs, hp, explored_count, cost = graph9.astar((19, 2), (3, 18), heuristic=grid_distance)
+	print "graph9 dijkstra:", measure_time(lambda: graph.dijkstra(graph9, (2, 19), (18, 3))[-2:])
+	print "graph9 astar, grid_distance:", measure_time(lambda: graph.astar(graph9, (2, 19), (18, 3), heuristic=grid_distance)[-2:])
+	print "graph9 astar, bird_distance:", measure_time(lambda: graph.astar(graph9, (2, 19), (18, 3), heuristic=bird_distance)[-2:])
+	print "graph9 astar, bird_distance / 2:", measure_time(lambda: graph.astar(graph9, (2, 19), (18, 3), heuristic=lambda *xs: bird_distance(*xs) / 2.0)[-2:])
+	print "graph9 astar, bird_distance * 2:", measure_time(lambda: graph.astar(graph9, (2, 19), (18, 3), heuristic=lambda *xs: bird_distance(*xs) * 2.0)[-2:])
+	d_path, d_costs, d_explored_count, d_cost = graph.dijkstra(graph9, (19, 2), (3, 18))
+	path, costs, hp, explored_count, cost = graph.astar(graph9, (19, 2), (3, 18), heuristic=grid_distance)
+
+	graph9_b = graph9 # graph.GridGraph(3, 3)
+	dfs_seen, dfs_edges, dfs_succeeded = graph.dfs(graph9_b, (0, 0), (18, 18))
+	print "nodes, edges:", len(list(graph9_b.nodes())), len(dfs_edges)
+	graph9_dfs = graph.Graph(graph9_b.nodes(), dfs_edges)
+	bfs_seen, bfs_edges, bfs_succeeded = graph.bfs(graph9_b, (0, 0), (18, 18))
+	print "more nodes, edges:", len(list(graph9_b.nodes())), len(bfs_edges)
+	graph9_bfs = graph.Graph(graph9_b.nodes(), bfs_edges)
 
 	with open('graph.html', 'w') as f:
-		f.write(graph_html([(graph9, d_path, d_costs), (graph9, path, costs)]))
+		f.write(graph_html([
+			(graph9, d_path, d_costs), 
+			(graph9, path, costs),
+			(graph9_bfs, [], dict((k, 1) for k in bfs_seen)),
+			(graph9_dfs, [], dict((k, 1) for k in dfs_seen)),
+			]))
 
+if True:
+	graph10 = graph.Graph(
+		['a', 'b', 'c', 'd', 'e'], 
+		[
+			('a', 'a', 0),
+			('b', 'a', 1),
+			('a', 'c', 3),
+			('d', 'd', 1),
+			('e', 'e', 1),
+			('d', 'e', 6),
+			('d', 'e', 4),
+			('d', 'e', 2),
+		])
+	print "graph10 prim:", graph.prim(graph10)
+	print "graph10 kruskal:", graph.kruskal(graph10)
+
+	graph11 = graph.GridGraph(4, 4, weight = lambda (r1, c1), (r2, c2): min(abs(r1-c1), abs(r2-c2)) + 1)
+	print "graph11 prim:", graph.prim(graph11)

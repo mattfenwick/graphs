@@ -47,8 +47,9 @@ def tr(classes):
 
 def td(text, classes):
 	return Element('td', [text], [], classes)
-		
+
 def graph_table(graph, path, visited):
+	print "graph_table:", graph, len(list(graph.nodes())), path, visited
 	node_strings = {}
 	for (i, node) in enumerate(path):
 		node_strings[node] = ('path', str(i))
@@ -56,7 +57,7 @@ def graph_table(graph, path, visited):
 		if not node in node_strings:
 			node_strings[node] = ('fringe', str(visited[node]))
 	rows = []
-	nodes = sorted(graph.nodes)
+	nodes = sorted(graph.nodes())
 	prev = None
 	for node in nodes:
 		if node[0] != prev:
@@ -64,7 +65,7 @@ def graph_table(graph, path, visited):
 			rows.append([])
 		hor = ''
 		ver = ''
-		for ((r, c), w) in graph.edges[node]:
+		for ((r, c), w) in graph.edges(node):
 			if r == (node[0] + 1) and c == node[1]:
 				ver = str(w)
 			if r == node[0] and c == (node[1] + 1):
